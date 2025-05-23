@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Đánh giá</title>
+  <style>
+    .rating {
+      direction: rtl;
+      unicode-bidi: bidi-override;
+      font-size: 2em;
+      display: inline-flex;
+    }
+    .rating input {
+      display: none;
+    }
+    .rating label {
+      color: #ddd;
+      cursor: pointer;
+    }
+    .rating input:checked ~ label,
+    .rating label:hover,
+    .rating label:hover ~ label {
+      color: gold;
+    }
+    .result {
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h2>Đánh giá dịch vụ</h2>
+  <form id="ratingForm">
+    <div class="rating">
+      <input type="radio" name="rating" id="star5" value="5"><label for="star5">★</label>
+      <input type="radio" name="rating" id="star4" value="4"><label for="star4">★</label>
+      <input type="radio" name="rating" id="star3" value="3"><label for="star3">★</label>
+      <input type="radio" name="rating" id="star2" value="2"><label for="star2">★</label>
+      <input type="radio" name="rating" id="star1" value="1"><label for="star1">★</label>
+    </div>
+    <br><br>
+    <button type="submit">Gửi đánh giá</button>
+  </form>
+  <div class="result" id="result"></div>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxRxfU9FM5XBKJbQS9jsFWdK4NwkPsqS2xuOPYX_5Fj2j7do2bzmRxQWsXAGsWhqPfO/exec";
+
+    document.getElementById('ratingForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const rating = document.querySelector('input[name="rating"]:checked');
+      if (!rating) return alert("Vui lòng chọn mức sao.");
+      await fetch(scriptURL, {
+        method: 'POST',
+        body: new URLSearchParams({ rating: rating.value })
+      });
+      loadAverage();
+    });
+
+    async function loadAverage() {
+      const res = await fetch(scriptURL);
+      const data = await res.json();
+      document.getElementById('result').innerText =
+        `Điểm trung bình: ${data.avg} (${data.count} lượt đánh giá)`;
+    }
+
+    loadAverage();
+  </script>
+</body>
+</html>
